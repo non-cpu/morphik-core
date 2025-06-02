@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+import os
 import time  # Add time import for profiling
 from datetime import UTC, datetime, timedelta
 from typing import Any, Dict, List, Optional, Union
@@ -44,7 +45,8 @@ from core.services.telemetry import TelemetryService
 from core.services_init import document_service
 
 # Set up logging configuration for Docker environment
-setup_logging()
+log_level = os.getenv("LOG_LEVEL", "INFO")
+setup_logging(log_level)
 
 # Initialize FastAPI app
 logger = logging.getLogger(__name__)

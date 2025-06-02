@@ -41,9 +41,15 @@ os.makedirs("logs", exist_ok=True)
 # Set up file handler for worker_ingestion.log
 file_handler = logging.FileHandler("logs/worker_ingestion.log")
 file_handler.setFormatter(logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
-logger.addHandler(file_handler)
-# Set logger level based on settings (diff used INFO directly)
-logger.setLevel(logging.INFO)
+
+# Get log level from environment variable
+log_level = os.getenv("LOG_LEVEL", "INFO")
+numeric_level = getattr(logging, log_level.upper(), logging.INFO)
+
+# Configure root logger to propagate logs to all modules
+root_logger = logging.getLogger()
+root_logger.setLevel(numeric_level)
+root_logger.addHandler(file_handler)
 
 
 async def get_document_with_retry(document_service, document_id, auth, max_retries=3, initial_delay=0.3):
