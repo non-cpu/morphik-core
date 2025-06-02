@@ -1,18 +1,4 @@
-x-ollama-check: &ollama-check
-  # This command reads the toml file and checks if any provider is set to "ollama"
-  command: >
-    /bin/sh -c '
-    grep -q "provider *= *\"ollama\"" morphik.toml &&
-    echo "true" > /tmp/needs_ollama ||
-    echo "false" > /tmp/needs_ollama'
-
 services:
-  config-check:
-    image: alpine
-    volumes:
-      - ./morphik.toml:/morphik.toml
-    <<: *ollama-check
-
   morphik:
     build: .
     ports:
@@ -36,8 +22,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      config-check:
-        condition: service_completed_successfully
       ollama:
         condition: service_started
         required: false
@@ -45,6 +29,19 @@ services:
       - morphik-network
     env_file:
       - .env
+
+  ui:
+    build:
+      context: ./ee/ui-component
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://morphik:8000
+    depends_on:
+      - morphik
+    networks:
+      - morphik-network
 
   worker:
     build:
@@ -68,8 +65,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      config-check:
-        condition: service_completed_successfully
       ollama:
         condition: service_started
         required: false
@@ -104,7 +99,7 @@ services:
       - POSTGRES_DB=morphik
       - PGDATA=/var/lib/postgresql/data/pgdata
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
