@@ -1,4 +1,4 @@
-FROM postgres:15-alpine
+FROM postgres:15.12-alpine
 
 # Install build dependencies
 RUN apk add --no-cache \
