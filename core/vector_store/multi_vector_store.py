@@ -110,6 +110,7 @@ class MultiVectorStore(BaseVectorStore):
             with self.get_connection() as conn:
                 # Register vector extension
                 conn.execute("CREATE EXTENSION IF NOT EXISTS vector")
+                conn.commit()
                 register_vector(conn)
 
             # First check if the table exists and if it has the required columns
@@ -182,6 +183,8 @@ class MultiVectorStore(BaseVectorStore):
                         ON multi_vector_embeddings (document_id)
                     """
                     )
+                    
+                    conn.commit()
             except Exception as e:
                 # Log index creation failure but continue
                 logger.warning(f"Failed to create index: {str(e)}")
@@ -221,6 +224,9 @@ class MultiVectorStore(BaseVectorStore):
                         $$ LANGUAGE SQL
                     """
                     )
+                    
+                    conn.commit()
+
                     logger.info("Created max_sim function successfully")
             except Exception as e:
                 logger.error(f"Error creating max_sim function: {str(e)}")
