@@ -36,7 +36,7 @@ COPY pyproject.toml uv.lock ./
 # This also creates the /app/.venv directory
 # Cache buster: 1 - verbose flag added
 RUN --mount=type=cache,target=${UV_CACHE_DIR} \
-    uv sync --verbose --locked --no-install-project
+    uv sync --verbose --no-install-project
 
 # Copy the rest of the application code
 # Assuming start_server.py is at the root or handled by pyproject.toml structure.
@@ -45,7 +45,7 @@ COPY . .
 # Install the project itself into the venv in non-editable mode
 # Cache buster: 1 - verbose flag added
 RUN --mount=type=cache,target=${UV_CACHE_DIR} \
-    uv sync --verbose --locked --no-editable
+    uv sync --verbose --no-editable
 
 # Install additional packages as requested
 # Cache buster: 1 - verbose flag added
@@ -79,6 +79,7 @@ RUN apt-get update && apt-get install -y \
     cmake \
     python3-dev \
     git \
+    pandoc \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy the virtual environment from the builder stage
